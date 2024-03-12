@@ -1,0 +1,23 @@
+version: '3.8'
+services:
+  postgres-db:
+    image: postgres:latest
+    container_name: msproduct
+    environment:
+      POSTGRES_DB: msproduct
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  java-app:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres-db
+
+volumes:
+  pg_data:
