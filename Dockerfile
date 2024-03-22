@@ -1,12 +1,10 @@
-# docker build -f Dockerfile -t wattwise-local .
-# docker run -p 5432:5432 -v $(pwd):/wattwise/ wattwise-local
+FROM maven:3.8.4-openjdk-17-slim AS build
+WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
 
-FROM postgres:latest
-
-ENV POSTGRES_DB msproduct
-ENV POSTGRES_USER postgres
-ENV POSTGRES_PASSWORD postgres
-
-COPY init.sql /docker-entrypoint-initdb.d/
-
-EXPOSE 5432
+FROM openjdk:17-jdk-slim
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
+CMD ["java", "-jar", "app.jar"]

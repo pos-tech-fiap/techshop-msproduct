@@ -1,23 +1,26 @@
 version: '3.8'
+
 services:
-  postgres-db:
+  postgres:
     image: postgres:latest
-    container_name: msproduct
     environment:
       POSTGRES_DB: msproduct
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5432:5432"
-    volumes:
-      - pg_data:/var/lib/postgresql/data
 
-  java-app:
+  msproduct-app:
     build:
-      context: ./
+      context: .
       dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
     depends_on:
-      - postgres-db
-
-volumes:
-  pg_data:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/msproduct
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
