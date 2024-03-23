@@ -1,6 +1,7 @@
 package br.com.fiap.techshopmsproduct.service;
 
 import br.com.fiap.techshopmsproduct.dto.ProductDTO;
+import br.com.fiap.techshopmsproduct.dto.SubtractProductDTO;
 import br.com.fiap.techshopmsproduct.model.Product;
 import br.com.fiap.techshopmsproduct.repository.IProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigInteger;
 import java.util.NoSuchElementException;
 
 @Service
@@ -29,6 +31,15 @@ public class ProductService {
         var product = productRepository.findById(id).orElseThrow(() -> new RuntimeException("Produto não encontrado!"));
 
         return new ProductDTO(product);
+    }
+
+    @Transactional
+    public void subtractProduct(SubtractProductDTO subtractProductDTO) {
+        var product = productRepository.findById(subtractProductDTO.id())
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado, id:" + subtractProductDTO.id()));
+        var newQuantity = updateQuantity(product.getQuantity(), subtractProductDTO.quantity());
+        product.setQuantity(newQuantity);
+        productRepository.save(product);
     }
 
     @Transactional
@@ -72,5 +83,14 @@ public class ProductService {
         entity.setDescription(dto.description());
         entity.setPrice(dto.price());
         entity.setQuantity(dto.quantity());
+    }
+
+    private BigInteger updateQuantity(BigInteger currentQuantity, BigInteger requestedQuantity) {
+        final BigInteger newQuantity = currentQuantity.subtract(requestedQuantity);
+        if (newQuantity.compareTo(BigInteger.ZERO) < 0) {
+            throw new IllegalStateException("Sem estoque suficiente!");
+        } else {
+            return newQuantity;
+        }
     }
 }

@@ -1,6 +1,7 @@
 package br.com.fiap.techshopmsproduct.controller;
 
 import br.com.fiap.techshopmsproduct.dto.ProductDTO;
+import br.com.fiap.techshopmsproduct.dto.SubtractProductDTO;
 import br.com.fiap.techshopmsproduct.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,13 @@ public class ProductController {
         var product = productService.findById(id);
 
         return ResponseEntity.ok(product);
+    }
+
+    @PutMapping(value = "/subtractProduct")
+    public ResponseEntity subtractProduct(@RequestBody @Valid SubtractProductDTO subtractProductDTO) {
+        productService.subtractProduct(subtractProductDTO);
+
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping
