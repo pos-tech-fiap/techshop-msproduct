@@ -7,9 +7,9 @@ import jakarta.validation.constraints.PositiveOrZero;
 
 import java.math.BigInteger;
 
-public record ProductDTO(@NotBlank String name, String description, @PositiveOrZero BigInteger quantity, @NotNull Double price) {
+public record ProductDTO(Long id, @NotBlank String name, String description, @PositiveOrZero BigInteger quantity, @NotNull Double price) {
 
     public ProductDTO(Product product) {
-        this(product.getName(), product.getDescription(), product.getQuantity(), product.getPrice());
+        this(product.getId(), product.getName(), product.getDescription(), product.getQuantity(), product.getPrice());
     }
 }
